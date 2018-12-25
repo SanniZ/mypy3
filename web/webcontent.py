@@ -16,7 +16,6 @@ import io
 import requests
 import subprocess
 import socket
-import http.client
 
 from mypy.mypy import MyPath, MyFile, MyPrint
 
@@ -63,7 +62,7 @@ class WebContent (object):
         if content_type:
             charset = pattern.search(re.sub('charset=(\"|\')', 'charset=', content_type))
         if all((html, not charset)):
-            charset = pattern.search(re.sub('charset=(\"|\')', 'charset=', html))
+            charset = pattern.search(re.sub('charset=(\"|\')', 'charset=', str(html)))
         # get data
         if charset:
             charset = charset.group()
@@ -171,7 +170,7 @@ class WebContent (object):
                         if view:
                             cls.pr.pr_info('uget: %s' % fname)
                         f.write(r.read())
-            except (URLError, HTTPError, httplib.BadStatusLine) as e:
+            except (URLError, HTTPError) as e:
                 cls.pr.pr_warn('%s, uget %s failed.' % (str(e), url))
 
     @classmethod

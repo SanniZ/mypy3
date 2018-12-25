@@ -139,7 +139,7 @@ class WebImage(object):
         return WebContent.get_url_content(url=url, view=view)
 
     def get_title(self, html, pattern=None):
-        title = WebContent.get_url_title(html, pattern)
+        title = WebContent.get_url_title(html, pattern).decode()
         if self._redundant_title:
             for rt in self._redundant_title:
                 title = title.replace(rt, '')
@@ -220,7 +220,6 @@ class WebImage(object):
         title = self.get_title(header_content, self._title)
         if not title:
             title = self.convert_url_to_title(url)
-        title = title.decode('utf-8')
         self._pr.pr_dbg('title: %s' % title)
         # create path of title to store data.
         subpath = os.path.join(self._path, title)
