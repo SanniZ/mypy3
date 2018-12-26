@@ -12,8 +12,8 @@ class Meizitu(WebImage):
 
     def __init__(self, name=None):
         super(Meizitu, self).__init__(name)
-        self._url_base = u'http://www.meizitu.com/a/URLID.html'
-        self._redundant_title = [u' | 妹子图', u' - 妹子图', u' | 性感妹子', u' - 性感妹子']
+        self._url_base = 'http://www.meizitu.com/a/URLID.html'
+        self._redundant_title = [' | 妹子图', ' - 妹子图', ' | 性感妹子', ' - 性感妹子']
 
 if __name__ == '__main__':
     mz = Meizitu()

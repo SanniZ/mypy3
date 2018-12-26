@@ -10,7 +10,7 @@ import os
 import re
 from PIL import Image as PILImg
 
-from mypy.mypy import MyFile
+from mypy.myfile import MyFile
 
 IMG_W_MIN = 320
 IMG_H_MIN = 320
@@ -206,8 +206,8 @@ if __name__ == '__main__':
         '    nz: True is set %0d, False is set %d'
     )
 
-    pr = MyPrint('Image')
     Img = Image()
+    pr = MyPrint(Img.__class__.__name__)
     xval = None
     args = MyBase.get_user_input('hc:r:R:x:o:')
     if '-h' in args:

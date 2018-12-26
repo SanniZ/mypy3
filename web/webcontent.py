@@ -17,7 +17,9 @@ import requests
 import subprocess
 import socket
 
-from mypy.mypy import MyPath, MyFile, MyPrint
+from mypy.mypath import MyPath
+from mypy.myfile import MyFile
+from mypy.myprint import MyPrint
 
 USER_AGENTS = {
     'AppleWebKit/537.36' : 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36 LBBROWSER',
@@ -257,7 +259,8 @@ class WebContent (object):
 
 if __name__ == '__main__':
 
-    from mypy import MyBase, MyPrint
+    from mypy.mybase import MyBase
+    from mypy.myprint import MyPrint
 
     HELP_MENU = (
         '==================================',
@@ -284,7 +287,7 @@ if __name__ == '__main__':
     view = False
 
     wc = WebContent()
-    pr = MyPrint('WebContent')
+    pr = MyPrint(wc.__class__.__name__)
 
     args = MyBase.get_user_input('hp:u:d:v')
     if '-h' in args:

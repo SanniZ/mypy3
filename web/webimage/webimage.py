@@ -11,7 +11,10 @@ import re
 import threading
 import queue
 
-from mypy.mypy import MyBase, MyPath, MyPrint
+from mypy.mybase import MyBase
+from mypy.mypath import MyPath
+from mypy.myprint import MyPrint
+
 from web.webcontent import WebContent, USER_AGENTS
 from image.image import Image
 
@@ -64,7 +67,7 @@ class WebImage(object):
         self._xval = None
         self._dl_image = self.urlopen_get_url_image
         self._redundant_title = None
-        self._pr = MyPrint('WebImage')
+        self._pr = MyPrint(self.__class__.__name__)
         self.__dbg = 0
         self._thread_max = 5
         self._thread_queue = None

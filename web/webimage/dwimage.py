@@ -11,7 +11,10 @@ import re
 import threading
 import queue
 
-from mypy.mypy import MyBase, MyPrint, MyPath
+
+from mypy.mybase import MyBase
+from mypy.mypath import MyPath
+from mypy.myprint import MyPrint
 
 from web.webcontent import WebContent
 from web.webimage.girlsky import Girlsky
@@ -87,7 +90,7 @@ class DWImage(WebContent):
         self._url = None
         self._xval = None
         self._in_file = None
-        self._pr = MyPrint('DWImage')
+        self._pr = MyPrint(self.__class__.__name__)
         self._class = None
         self._thread_max = 5
         self._thread_queue = None
@@ -160,7 +163,7 @@ class DWImage(WebContent):
             total = len(lines)
             index = 1
             # remove -i args
-            if all((args,args.has_key('-i'))):
+            if all((args,'-i' in args)):
                     del args['-i']
             for url in lines:
                 self._class = None
