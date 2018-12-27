@@ -6,10 +6,10 @@ Created on 2018-12-04
 @author: Byng Zeng
 """
 
-from mybase import MyBase
-from myfile import MyFile
-from mypath import MyPath
-from myprint import MyPrint
+from base import Base
+from file import File
+from path import Path
+from print import Print
 
 
 class MyPy(object):
@@ -20,7 +20,7 @@ class MyPy(object):
         fs = None
         pattern = re.compile('%s' % wd, re.I)
         # check files now
-        if MyPath.path_is_file(path):
+        if Path.path_is_file(path):
             with open(path, 'r') as fd:
                 data = fd.read()
             data = pattern.findall(data)
@@ -37,7 +37,7 @@ class MyPy(object):
                     for f in fs:
                         if ftype:
                             # check type of file.
-                            if MyFile.get_filetype(f) != ftype:
+                            if File.get_filetype(f) != ftype:
                                 continue
                         f = os.path.join(rt, f)
                         lst = list()
@@ -53,7 +53,7 @@ class MyPy(object):
     # -w word: new
     @classmethod
     def sub(cls, path, wd, newd, ftype=None):
-        if MyPath.path_is_file(path):
+        if Path.path_is_file(path):
             with open(path, 'r') as fd:
                 data = fd.read()
             data = re.sub(wd, newd, data)
@@ -70,7 +70,7 @@ class MyPy(object):
                     for f in fs:
                         if ftype:
                             # check type of file.
-                            if MyFile.get_filetype(f) != ftype:
+                            if File.get_filetype(f) != ftype:
                                 continue
                         f = os.path.join(rt, f)
                         with open(f, 'r') as fd:
@@ -96,20 +96,20 @@ if __name__ == '__main__':
         '    ftype: file type will be find',
     )
 
-    pr = MyPrint('MyPy')
+    pr = Print('MyPy')
 
-    args = MyBase.get_user_input('hf:s:')
+    args = Base.get_user_input('hf:s:')
     if '-h' in args:
-        MyBase.print_help(HELP_MENU)
+        Base.print_help(HELP_MENU)
     if '-f' in args:
         values = args['-f'].split(',')
         n = len(values)
         if n < 2:
-            MyBase.print_exit('input error, -h for help')
+            Base.print_exit('input error, -h for help')
         elif any((not values[0], not values[1])):
-            MyBase.print_exit('input error, -h for help')
+            Base.print_exit('input error, -h for help')
         # get args.
-        path = MyPath.get_abs_path(values[0])
+        path = Path.get_abs_path(values[0])
         wd = values[1]
         if n == 2:
             result = MyPy.find(path, wd)
@@ -125,10 +125,10 @@ if __name__ == '__main__':
         values = args['-s'].split(',')
         n = len(values)
         if n < 3:
-            MyBase.print_exit('input error, -h for help')
+            Base.print_exit('input error, -h for help')
         elif any((not values[0], not values[1])):
-            MyBase.print_exit('input error, -h for help')
-        path = MyPath.get_abs_path(values[0])
+            Base.print_exit('input error, -h for help')
+        path = Path.get_abs_path(values[0])
         wd = values[1]
         newd = values[2]
         if n == 3:

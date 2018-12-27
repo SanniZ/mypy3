@@ -10,7 +10,7 @@ import os
 import re
 from PIL import Image as PILImg
 
-from mypy.myfile import MyFile
+from mypy.file import File
 
 IMG_W_MIN = 320
 IMG_H_MIN = 320
@@ -41,7 +41,7 @@ class Image (object):
     # check image base on extname.
     @classmethod
     def image_file2(cls, f):
-        exname = MyFile.get_exname(f)
+        exname = File.get_exname(f)
         if exname in ['.jpg', '.png', '.gif', '.jpeg', '.bmp']:
             return True
         else:
@@ -121,7 +121,7 @@ class Image (object):
             fmt = img.format.lower()
             if fmt == 'jpeg':
                 fmt = 'jpg'
-            ftype = MyFile.get_filetype(f)
+            ftype = File.get_filetype(f)
             if not ftype: # no ext name
                 fname = '%s.%s' % (f, fmt)
             elif fmt != ftype:
@@ -185,7 +185,9 @@ class Image (object):
                     os.rename(f, fname)
 
 if __name__ == '__main__':
-    from mypy import MyBase, MyPrint, MyPath
+    from mypy.base import Base
+    from mypy.path import Path
+    from mypy.print import Print
 
     HELP_MENU = (
         '============================================',
@@ -207,15 +209,15 @@ if __name__ == '__main__':
     )
 
     Img = Image()
-    pr = MyPrint(Img.__class__.__name__)
+    pr = Print(Img.__class__.__name__)
     xval = None
-    args = MyBase.get_user_input('hc:r:R:x:o:')
+    args = Base.get_user_input('hc:r:R:x:o:')
     if '-h' in args:
-        MyBase.print_help(HELP_MENU)
+        Base.print_help(HELP_MENU)
     if '-x' in args:
         xval = args['-x']
     if '-c' in args:
-        result = Img.image_file(MyPath.get_abs_path(args['-c']))
+        result = Img.image_file(Path.get_abs_path(args['-c']))
         pr.pr_info(result)
     if '-r' in args:
         path = args['-r']
@@ -233,8 +235,8 @@ if __name__ == '__main__':
         val = args['-o'].split(',')
         n = len(val)
         if n == 2:
-            Img.set_order_images(MyPath.get_abs_path(val[0]), val[1])
+            Img.set_order_images(Path.get_abs_path(val[0]), val[1])
         elif n >= 3:
-            Img.set_order_images(MyPath.get_abs_path(val[0]), val[1], val[2])
+            Img.set_order_images(Path.get_abs_path(val[0]), val[1], val[2])
         else:
-            Img.set_order_images(MyPath.get_abs_path(val[0]))
+            Img.set_order_images(Path.get_abs_path(val[0]))

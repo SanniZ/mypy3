@@ -13,7 +13,7 @@ import gzip
 import io
 
 
-class MyFile(object):
+class File(object):
 
     @classmethod
     def get_fname(cls, f):

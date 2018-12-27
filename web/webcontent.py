@@ -17,9 +17,9 @@ import requests
 import subprocess
 import socket
 
-from mypy.mypath import MyPath
-from mypy.myfile import MyFile
-from mypy.myprint import MyPrint
+from mypy.path import Path
+from mypy.file import File
+from mypy.print import Print
 
 USER_AGENTS = {
     'AppleWebKit/537.36' : 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36 LBBROWSER',
@@ -48,7 +48,7 @@ class WebContent (object):
 
     WEB_URL_FILE = r'web_url.txt'
 
-    pr = MyPrint('WebContent')
+    pr = Print('WebContent')
 
     @classmethod
     def url_is_https(cls, url):
@@ -120,9 +120,9 @@ class WebContent (object):
             content = cls.get_html(url = url, retry_times = retry_times, view = view)
         # save content to path.
         if all((content, path)):
-            MyPath.make_path(path)
+            Path.make_path(path)
             f = '%s/%s' % (path, cls.convert_url_to_title(url))
-            if MyFile.get_exname(f) != '.html':
+            if File.get_exname(f) != '.html':
                 f = f + '.html'
             with open(f, 'w') as fd:
                 fd.write(content)
@@ -255,12 +255,12 @@ class WebContent (object):
 
     @classmethod
     def convert_url_to_title(cls, url):
-        return MyFile.reclaim_name(re.sub('/$', '', url))
+        return File.reclaim_name(re.sub('/$', '', url))
 
 if __name__ == '__main__':
 
-    from mypy.mybase import MyBase
-    from mypy.myprint import MyPrint
+    from mypy.base import Base
+    from mypy.print import Print
 
     HELP_MENU = (
         '==================================',
@@ -287,13 +287,13 @@ if __name__ == '__main__':
     view = False
 
     wc = WebContent()
-    pr = MyPrint(wc.__class__.__name__)
+    pr = Print(wc.__class__.__name__)
 
-    args = MyBase.get_user_input('hp:u:d:v')
+    args = Base.get_user_input('hp:u:d:v')
     if '-h' in args:
-        MyBase.print_help(HELP_MENU)
+        Base.print_help(HELP_MENU)
     if '-p' in args:
-        path = MyPath.get_abs_path(args['-p'])
+        path = Path.get_abs_path(args['-p'])
     if '-u' in args:
         url = args['-u']
     if '-v' in args:
@@ -310,11 +310,11 @@ if __name__ == '__main__':
         if all((args['-d'] in df_funcs.keys(), url)):
             df = df_funcs[args['-d']]
         else:
-            MyBase.print_exit('-d %s error, -h for help!' % args['-d'])
+            Base.print_exit('-d %s error, -h for help!' % args['-d'])
 
     # config default path
     if not path:
-        path = '%s/%s' % (MyPath.get_download_path(), wc.__class__.__name__)
+        path = '%s/%s' % (Path.get_download_path(), wc.__class__.__name__)
     # run cmd
     if df:
         df(url=url, path=path, view=view)

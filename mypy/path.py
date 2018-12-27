@@ -9,7 +9,7 @@ Created on 2018-12-26
 import os
 
 
-class MyPath(object):
+class Path(object):
 
     @classmethod
     def path_is_file(self, path):

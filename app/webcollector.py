@@ -8,9 +8,9 @@ Created on: 2018-12-19
 import os
 import re
 
-from mypy.mybase import MyBase
-from mypy.mypath import MyPath
-from mypy.myprint import MyPrint
+from mypy.base import Base
+from mypy.path import Path
+from mypy.print import Print
 
 class WebCollector(object):
 
@@ -23,7 +23,7 @@ class WebCollector(object):
         '  -t file: file to be save urls',
     )
 
-    pr = MyPrint('WebCollector')
+    pr = Print('WebCollector')
 
     def __init__(self, name=None):
         self._name = name
@@ -47,19 +47,19 @@ class WebCollector(object):
                 fd.write('%s\n' % url)
 
     def get_user_input(self):
-        args = MyBase.get_user_input('hs:t:')
+        args = Base.get_user_input('hs:t:')
         if '-h' in args:
-            MyBase.print_help(self.HELP_MENU)
+            Base.print_help(self.HELP_MENU)
         if '-s' in args:
             self._src = re.sub('/$', '', args['-s'])
         if '-t' in args:
-            self._tgt = MyPath.get_abs_path(args['-t'])
+            self._tgt = Path.get_abs_path(args['-t'])
         return args
 
     def main(self):
         self.get_user_input()
         if not self._src:
-            MyBase.print_exit('no -s, -h for help!')
+            Base.print_exit('no -s, -h for help!')
         if not self._tgt:
             self._tgt = '%s/%s.txt' % (self._src, os.path.basename(self._src))
         # collect urls.

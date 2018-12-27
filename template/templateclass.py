@@ -11,7 +11,7 @@ import os
 import sys
 import getopt
 
-from base import MyBase as Base
+from mypy.base import Base
 
 
 class Template(object):

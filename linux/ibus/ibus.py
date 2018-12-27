@@ -8,11 +8,11 @@ Created on 2018-12-05
 
 import subprocess
 
-from mypy.mybase import MyBase
-from mypy.mypath import MyPath
+from mypy.base import Base
+from mypy.path import Path
 
-WUBI_LOVE98_TXT = '%s/linux/ibus/ibus-love98.txt' % MyPath.get_mypy_path()
-WUBI_LOVE98_DB = '%s/linux/ibus/ibus-love98.db' % MyPath.get_mypy_path()
+WUBI_LOVE98_TXT = '%s/linux/ibus/ibus-love98.txt' % Path.get_mypy_path()
+WUBI_LOVE98_DB = '%s/linux/ibus/ibus-love98.db' % Path.get_mypy_path()
 IBUS_LOVE98_DB = '/usr/share/ibus-table/tables/wubi-love98.db'
 
 class IBus(object):
@@ -38,9 +38,9 @@ class IBus(object):
         '-b',
         '  setup wubi-jidian86',
         '-a',
-        '  add to dataMyBase of wubi-love98.db',
+        '  add to dataBase of wubi-love98.db',
         '-u',
-        '  update dataMyBase of wubi-love98.db',
+        '  update dataBase of wubi-love98.db',
     )
 
     def ibus_restart(self):
@@ -87,9 +87,9 @@ class IBus(object):
         subprocess.call(cmd, shell=True)
 
     def main(self):
-        args = MyBase.get_user_input('harLPpgSBbu')
+        args = Base.get_user_input('harLPpgSBbu')
         if '-h' in args:
-            MyBase.print_help(self.help_menu)
+            Base.print_help(self.help_menu)
         if '-a' in args:
             self.ibus_add_to_wubi_love98_db()
         if '-r' in args:

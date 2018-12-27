@@ -6,7 +6,7 @@ Created on: 2018-12-11
 @author: Byng Zeng
 """
 
-from mypy.mybase import MyBase
+from mypy.base import Base
 
 from web.webcontent import WebContent
 from web.webimage.webimage import WebImage

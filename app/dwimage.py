@@ -12,9 +12,9 @@ import threading
 import queue
 
 
-from mypy.mybase import MyBase
-from mypy.mypath import MyPath
-from mypy.myprint import MyPrint
+from mypy.base import Base
+from mypy.path import Path
+from mypy.print import Print
 
 from web.webcontent import WebContent
 from web.webimage.girlsky import Girlsky
@@ -90,7 +90,7 @@ class DWImage(WebContent):
         self._url = None
         self._xval = None
         self._in_file = None
-        self._pr = MyPrint(self.__class__.__name__)
+        self._pr = Print(self.__class__.__name__)
         self._class = None
         self._thread_max = 5
         self._thread_queue = None
@@ -98,22 +98,22 @@ class DWImage(WebContent):
 
     def get_input(self, args=None):
         if not args:
-            args = MyBase.get_user_input('hu:n:p:x:m:i:R:t:vDd')
+            args = Base.get_user_input('hu:n:p:x:m:i:R:t:vDd')
         if '-h' in args:
-            MyBase.print_help(self.HELP_MENU)
+            Base.print_help(self.HELP_MENU)
         if '-u' in args:
             self._url = re.sub('/$', '', args['-u'])
         if '-x' in args:
             self._xval = args['-x']
         if '-d' in args:
-            self._pr.set_pr_level(self._pr.get_pr_level() | MyPrint.PR_LVL_DBG)
+            self._pr.set_pr_level(self._pr.get_pr_level() | Print.PR_LVL_DBG)
         # get url_base from xval
         if self._xval:
             if self._xval in self.URL_BASE:
                 self._url_base = list(self.URL_BASE[self._xval])[0]
                 self._class = self.URL_BASE[self._xval][self._url_base]
             else:
-                MyBase.print_exit('[DWImage] Error, invalid -x val!')
+                Base.print_exit('[DWImage] Error, invalid -x val!')
         # get class from url
         if self._url:
             base, num = self.get_url_base_and_num(self._url)
@@ -126,7 +126,7 @@ class DWImage(WebContent):
                         self._class =  dict_url_base[self._url_base]
                         break
         if '-i' in args:
-            self._in_file = MyPath.get_abs_path(args['-i'])
+            self._in_file = Path.get_abs_path(args['-i'])
         return args
 
 

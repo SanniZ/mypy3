@@ -13,8 +13,8 @@ import hashlib
 import base64
 
 
-from mypy.mybase import MyBase
-from mypy.mypath import MyPath
+from mypy.base import Base
+from mypy.path import Path
 
 help_menu = (
     '======================================',
@@ -28,19 +28,19 @@ help_menu = (
 def get_face_image():
     fid = None
     sid = None
-    args = MyBase.get_user_input('hf:s:')
+    args = Base.get_user_input('hf:s:')
     if '-h' in args:
-        MyBase.print_help(help_menu)
+        Base.print_help(help_menu)
     if '-f' in args:
-        fid = MyPath.get_abs_path(args['-f'])
+        fid = Path.get_abs_path(args['-f'])
     if '-s' in args:
-        sid = MyPath.get_abs_path(args['-s'])
+        sid = Path.get_abs_path(args['-s'])
     return fid, sid
 
 def main():
     fid, sid = get_face_image()
     if fid == None or sid == None:
-        MyBase.print_exit('Error, no found id image.')
+        Base.print_exit('Error, no found id image.')
 
     x_appid = 'wsr00030d4d@ch407c0f6177e2477400'
     api_key = ''
