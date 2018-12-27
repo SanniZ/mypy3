@@ -37,9 +37,9 @@ class Code(object):
             cpus = 5
 
         if force == True:
-            cmd = r'repo sync -j{n} -f'.format(n=cpus)
+            cmd = r'repo sync -c -j{n} -f'.format(n=cpus)
         else:
-            cmd = r'repo sync -j{n}'.format(n=cpus)
+            cmd = r'repo sync -c -j{n}'.format(n=cpus)
         d.info(cmd)
         subprocess.call(cmd, shell=True)
 
