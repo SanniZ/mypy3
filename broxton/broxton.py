@@ -172,7 +172,7 @@ class Broxton(object):
                 d.info('update %s image' % image)
                 if avb == None:
                     avb = AvbImage()
-                avb.avb_make_image(image, self)
+                #avb.avb_make_image(image, self)
                 fimgs.append(image)
         # flash images.
         if len(fimgs) != 0:
@@ -180,17 +180,19 @@ class Broxton(object):
             # setup flash env
             ad = Android()
             #ad.adb_wait()
-            ad.reboot_bootloader()
+            # enter bootloader mode.
+            ad.run_cmd_handler(['rebootloader'])
             # unlock
-            ad.lock(False)
+            ad.run_cmd_handler(['deviceunlock'])
             # flash image now
             for image in fimgs:
                 fimage = r'{}/{}.img'.format(self._flashfiles, image)
                 #d.info('fastboot flash {} {}'.format(image, fimage))
-                ad.flash_image(image, fimage)
+                #ad.flash_image(image, fimage)
             # lock device.
-            ad.lock(True)
-            ad.fastboot_reboot()
+            ad.run_cmd_handler(['devicelock'])
+            # reboot
+            ad.run_cmd_handler(['fastreboot'])
 
     def flash_firmware(self, fw):
         cmd = r'sudo /opt/intel/platformflashtool/bin/ias-spi-programmer --write {}'.format(fw)

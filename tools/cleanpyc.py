@@ -36,10 +36,10 @@ def clean_pyc(path=os.getenv('MYPY'), show=False):
                     os.remove(f)
                     if show:
                         print('remove: %s' % f)
-		if dr:
-			for d in dr:
-				if d == '__pycache__':
-					os.remove(d)
+            if dr:
+                for d in dr:
+                    if d == '__pycache__':
+                        os.remove(d)
 
 if __name__ == '__main__':
     args = Base.get_user_input('hp:vc')

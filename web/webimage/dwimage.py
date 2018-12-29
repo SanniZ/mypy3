@@ -6,6 +6,7 @@ Created on: 2018-12-11
 @author: Byng Zeng
 """
 
+import os
 import re
 
 import threading
@@ -87,9 +88,9 @@ class DWImage(WebContent):
         self._name = name
         self._web_base = None
         self._url_base = None
+        self._url_file = None
         self._url = None
         self._xval = None
-        self._in_file = None
         self._pr = Print(self.__class__.__name__)
         self._class = None
         self._thread_max = 5
@@ -98,11 +99,14 @@ class DWImage(WebContent):
 
     def get_input(self, args=None):
         if not args:
-            args = Base.get_user_input('hu:n:p:x:m:i:R:t:vDd')
+            args = Base.get_user_input('hu:n:p:x:m:R:t:vDd')
         if '-h' in args:
             Base.print_help(self.HELP_MENU)
         if '-u' in args:
-            self._url = re.sub('/$', '', args['-u'])
+            if os.path.isfile(args['-u']):
+                self._url_file = Path.get_abs_path(args['-u'])
+            else:
+                self._url = re.sub('/$', '', args['-u'])
         if '-x' in args:
             self._xval = args['-x']
         if '-d' in args:
@@ -125,8 +129,6 @@ class DWImage(WebContent):
                     if self._url_base == list(dict_url_base)[0]:
                         self._class =  dict_url_base[self._url_base]
                         break
-        if '-i' in args:
-            self._in_file = Path.get_abs_path(args['-i'])
         return args
 
 
@@ -156,15 +158,16 @@ class DWImage(WebContent):
 
 
     def process_file_input(self, args=None):
-        if self._in_file:
-            with open(self._in_file, 'r') as fd:
+        if self._url_file:
+            with open(self._url_file, 'r') as fd:
                 lines =  set(fd.readlines())
             self._thread_queue = queue.Queue(self._thread_max)
             total = len(lines)
             index = 1
-            # remove -i args
-            if all((args,'-i' in args)):
-                    del args['-i']
+            # delete -u arg.
+            if '-u' in args:
+                del args['-u']
+            # process all of url.
             for url in lines:
                 self._class = None
                 # remove invalid chars.
@@ -173,7 +176,7 @@ class DWImage(WebContent):
                 # get base and num
                 base, num = self.get_url_base_and_num(url)
                 if base:
-                    for dict_url_base in self.URL_BASE.itervalues():
+                    for dict_url_base in self.URL_BASE.values():
                         if base == list(dict_url_base)[0]:
                             self._class =  dict_url_base[base]
                             break
@@ -190,7 +193,7 @@ class DWImage(WebContent):
     def main(self, args=None):
         if not args:
             args = self.get_input()
-        if self._in_file:
+        if self._url_file:
             self.process_file_input(args)
         else:
             self.process_input()
