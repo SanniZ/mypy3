@@ -12,18 +12,18 @@ from mypy.base import Base
 from mypy.path import Path
 from mypy.print import Print
 
-class WebCollector(object):
+class WebURLCrawler(object):
 
     HELP_MENU = (
         '==================================',
-        '    CollectWebURL help',
+        '    WebURLCrawler help',
         '==================================',
         'option: -s path -t file',
         '  -s path: path to be collect',
         '  -t file: file to be save urls',
     )
 
-    pr = Print('WebCollector')
+    pr = Print('WebURLCrawler')
 
     def __init__(self, name=None):
         self._name = name
@@ -66,5 +66,5 @@ class WebCollector(object):
         self.collect_web_url()
 
 if __name__ == '__main__':
-    wc = WebCollector()
+    wc = WebURLCrawler()
     wc.main()

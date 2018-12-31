@@ -126,10 +126,10 @@ class ICSCalendar(object):
     def get_ics_files2(cls, path):
         cmd = 'find %s -name *.ics' % path
         try:
-    	    fs = subprocess.check_output(cmd, shell = True)
+            fs = subprocess.check_output(cmd, shell = True)
             fs = list(fs.split())
         except subprocess.CalledProcessError:
-            print 'No found .ics at %s' % path
+            print('No found .ics at %s' % path)
             fs = None
         return fs
 
@@ -280,7 +280,7 @@ class ICSCalendar(object):
                     f.write('%s,' % event._description[len('DESCRIPTION:'):len(event._description)-1])
                 # write type of data.
                 f.write('%s\n' % event._type)
-        print 'output: %s' % name
+        print('output: %s' % name)
 
     # save data to .txt file.
     def save_to_txt(self):
@@ -318,7 +318,7 @@ class ICSCalendar(object):
                     f.write('DESCRIPTION:\n')
                 else:
                     f.write('DESCRIPTION: %s\n' % event._description[len('DESCRIPTION:'):len(event._description) - 1])
-        print 'output: %s' % name
+        print('output: %s' % name)
 
     # print all of data.
     def print_ics_contents(self):
@@ -327,29 +327,35 @@ class ICSCalendar(object):
             # date and time.
             if event._date_e == event._date_s: # at the same day.
                 if event._time_s == None or event._time_e == None: # days event: xxxx/xx/xx
-                    print '%s/%s/%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8], event._type)
+                    print('%s/%s/%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8], event._type))
                 else: # day event: xxxx/xx/xx xx:xx-xx:xx
-                    print '%s/%s/%s %s:%s-%s:%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8],
-                                                         event._time_s[0:2], event._time_s[2:4], event._time_e[0:2], event._time_e[2:4], event._type)
+                    print('%s/%s/%s %s:%s-%s:%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8],
+                                                         event._time_s[0:2], event._time_s[2:4],
+                                                         event._time_e[0:2], event._time_e[2:4],
+                                                         event._type))
             else:
                 if event._time_s == None or event._time_e == None: # days event: xxxx/xx/xx-xxxx/xx/xx
-                    print '%s/%s/%s-%s/%s/%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8],
-                                                      event._date_e[0:4], event._date_e[4:6], event._date_e[6:8], event._type)
+                    print('%s/%s/%s-%s/%s/%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8],
+                                                      event._date_e[0:4], event._date_e[4:6], event._date_e[6:8],
+                                                      event._type))
                 else: # day event: xxxx/xx/xx xx:xx-xx:xx
-                    print '%s/%s/%s %s:%s-%s/%s/%s %s:%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8], event._time_s[0:2], event._time_s[2:4],
-                                                                  event._date_e[0:4], event._date_e[4:6], event._date_e[6:8], event._time_e[0:2], event._time_e[2:4], event._type)
+                    print('%s/%s/%s %s:%s-%s/%s/%s %s:%s %s\n' % (event._date_s[0:4], event._date_s[4:6], event._date_s[6:8],
+                                                                  event._time_s[0:2], event._time_s[2:4],
+                                                                  event._date_e[0:4], event._date_e[4:6], event._date_e[6:8],
+                                                                  event._time_e[0:2], event._time_e[2:4],
+                                                                  event._type))
             # location
             if event._location == None:
-                print 'LOCATION   : \n'
+                print('LOCATION   : \n')
             else:
-                print 'LOCATION   : %s\n' % event._location[len('LOCATION:'):len(event._location)-1]
+                print('LOCATION   : %s\n' % event._location[len('LOCATION:'):len(event._location)-1])
             # summary
-            print 'SUMMARY    : %s\n' % event._summary[len('SUMMARY:'):len(event._summary)-1]
+            print('SUMMARY    : %s\n' % event._summary[len('SUMMARY:'):len(event._summary)-1])
             # description
             if event._description == None:
-                print 'DESCRIPTION:\n'
+                print('DESCRIPTION:\n')
             else:
-                print 'DESCRIPTION: %s\n' % event._description[len('DESCRIPTION:'):len(event._description) - 1]
+                print('DESCRIPTION: %s\n' % event._description[len('DESCRIPTION:'):len(event._description) - 1])
 
     # call function to output data.
     def format_output(self):
@@ -365,7 +371,7 @@ class ICSCalendar(object):
         elif self._fmt == None:
             self.print_ics_contents()
         else:
-            print 'Error, use -f txt/csv to set format output\n'
+            print('Error, use -f txt/csv to set format output\n')
             Base.print_help(self.help_menu)
 
         # clear all of events.
@@ -380,7 +386,7 @@ class ICSCalendar(object):
     # process ics file data.
     def process_ics(self, ics):
         if os.path.isfile(ics) != True:
-            print 'Error, no found %s' % ics
+            print('Error, no found %s' % ics)
             return False
 
         with open(ics, 'r') as f:

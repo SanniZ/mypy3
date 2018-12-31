@@ -25,11 +25,11 @@ from web.webimage.mzitu import Mzitu
 from web.webimage.webimage import WebImage
 
 
-class DWImage(WebContent):
+class WebImageCrawler(WebContent):
 
     HELP_MENU = (
         '==================================',
-        '    DWImage help',
+        '    WebImageCrawler help',
         '==================================',
         'option: -u url -n number -p path -x val -m mode -R file -t num -v',
         '  -u:',
@@ -117,7 +117,7 @@ class DWImage(WebContent):
                 self._url_base = list(self.URL_BASE[self._xval])[0]
                 self._class = self.URL_BASE[self._xval][self._url_base]
             else:
-                Base.print_exit('[DWImage] Error, invalid -x val!')
+                Base.print_exit('[WebImageCrawler] Error, invalid -x val!')
         # get class from url
         if self._url:
             base, num = self.get_url_base_and_num(self._url)
@@ -147,7 +147,7 @@ class DWImage(WebContent):
         if hdr:
             hdr.main(args)
         else:
-            self._pr.pr_err('[DWImage] Error, no found handler!')
+            self._pr.pr_err('[WebImageCrawler] Error, no found handler!')
         # release queue
         if self._thread_queue:
             self._thread_queue.get()
@@ -199,5 +199,5 @@ class DWImage(WebContent):
             self.process_input()
 
 if __name__ == '__main__':
-    dwimg = DWImage()
-    dwimg.main()
+    wc = WebImageCrawler()
+    wc.main()

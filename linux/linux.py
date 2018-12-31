@@ -44,14 +44,21 @@ class HwInfo(object):
                 d.info(self.get_host_ip())
 
     def get_cmd_handlers(self, cmd=None):
-        return {
+        hdrs = {
             'help' : self.help,
             'hwinfo' : self.hwif_handler,
         }
+        if cmd == None:
+            return hdrs
+        else:
+            if cmd in hdrs:
+                return hdrs[cmd]
+            else:
+                return None
 
 class FileOps(object):
     def __init__(self):
-        d.dbg('FileOps init done!') 
+        d.dbg('FileOps init done!')
 
     def help(self, cmds):
         for cmd in cmds:

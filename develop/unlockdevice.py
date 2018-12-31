@@ -11,9 +11,9 @@ import getopt
 import subprocess
 import time
 
-class UnlockDeviceTest(object):
+class UnlockDevice(object):
 
-    USAGE = (
+    HELP_MENU = (
         '============================================',
         '    UnlockDeviceTest',
         '============================================',
@@ -26,7 +26,7 @@ class UnlockDeviceTest(object):
     )
 
     def __init__(self):
-        self._cnt = 50  # test times.
+        self._unlock_times = 0  # test times.
         self._state = 1 # power on and locked.
         self._key_pos = (500, 600) # key position (620, 920)
 
@@ -38,26 +38,28 @@ class UnlockDeviceTest(object):
         cmd = 'adb shell input tap %s %s' % (self._key_pos[0], self._key_pos[1])
         subprocess.call(cmd, shell=True)
 
-    def get_test_args(self):
+    def get_input_opts(self):
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'ht:k:')
         except getopt.GetoptError as e:
             print(str(e))
+            opts = None
         else:
             for name, value in opts:
                 if name == '-h':
-                    for usage in self.USAGE:
+                    for usage in self.HELP_MENU:
                         print(usage)
                     sys.exit()
                 if name == '-t':
-                    self._cnt = int(value)
+                    self._unlock_times = int(value)
                 if name == '-k':
                     pos = value.split(',')
                     self._key_pos = tuple(pos)
+        return opts
 
-    def run_test(self):
-        for index in range(self._cnt):
-            print('Test: %d/%d' % (index + 1, self._cnt))
+    def run_unlock_test(self):
+        for index in range(self._unlock_times):
+            print('Test: %d/%d' % (index + 1, self._unlock_times))
             # no send power on while the first time and power on.
             if index != 0:
                 print('power up')
@@ -74,6 +76,11 @@ class UnlockDeviceTest(object):
 
 
 if __name__ == '__main__':
-    unlock = UnlockDeviceTest()
-    unlock.get_test_args()
-    unlock.run_test()
+    unlock = UnlockDevice()
+    # get input args.
+    opts = unlock.get_input_opts()
+    if not opts:
+        sys.exit()
+    # run test.
+    if unlock._unlock_times:
+        unlock.run_unlock_test()
