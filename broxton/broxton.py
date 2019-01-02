@@ -172,7 +172,7 @@ class Broxton(object):
                 d.info('update %s image' % image)
                 if avb == None:
                     avb = AvbImage()
-                #avb.avb_make_image(image, self)
+                avb.avb_make_image(image, self)
                 fimgs.append(image)
         # flash images.
         if len(fimgs) != 0:
@@ -187,8 +187,8 @@ class Broxton(object):
             # flash image now
             for image in fimgs:
                 fimage = r'{}/{}.img'.format(self._flashfiles, image)
-                #d.info('fastboot flash {} {}'.format(image, fimage))
-                #ad.flash_image(image, fimage)
+                d.info('fastboot flash {} {}'.format(image, fimage))
+                ad.flash_image(image, fimage)
             # lock device.
             ad.run_cmd_handler(['devicelock'])
             # reboot
