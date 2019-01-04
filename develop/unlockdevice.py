@@ -13,25 +13,20 @@ import time
 
 class UnlockDevice(object):
 
-    KEY_POS = (620, 920)
-
     HELP_MENU = (
         '============================================',
         '    UnlockDeviceTest',
         '============================================',
-        'options: -t n [-k n,n] [-s on/off]',
-        '  -t n: set times to test',
-        '  -k n,n: set unlock key position',
-        '     default set: -k %s,%s' % (KEY_POS[0], KEY_POS[1]),
-        '  -s on/off: current state: power on or off.',
-        '',
-        'Note: power device to locked state before test.',
+        'options: -t num [-k num,num] [-s n]',
+        '  -t num: set times of test',
+        '  -k num,num: set position of unlock key',
+        '  -s n: current power state: 1 or 0',
     )
 
     def __init__(self):
         self._unlock_times = 0  # test times.
-        self._state = 1 # power on and locked.
-        self._key_pos = self.KEY_POS # key position (620, 920) ,(500, 600)
+        self._state = 1 # power on.
+        self._key_pos = (620, 920) # key position (620, 920) ,(500, 600)
 
     def send_power(self):
         cmd = 'adb shell input keyevent 26'
@@ -40,6 +35,7 @@ class UnlockDevice(object):
     def send_unlock(self):
         cmd = 'adb shell input tap %s %s' % (self._key_pos[0], self._key_pos[1])
         subprocess.call(cmd, shell=True)
+
 
     def get_input_opts(self):
         try:
@@ -52,6 +48,8 @@ class UnlockDevice(object):
                 if name == '-h':
                     for usage in self.HELP_MENU:
                         print(usage)
+                    print('\ndefault set: -k %s,%s -s %s' %
+                            (self._key_pos[0], self._key_pos[1], self._state))
                     sys.exit()
                 if name == '-t':
                     self._unlock_times = int(value)
@@ -59,30 +57,34 @@ class UnlockDevice(object):
                     pos = value.split(',')
                     self._key_pos = tuple(pos)
                 if name == '-s':
-                    if value == 'on':
-                        self._state = 1
-                    else:
-                        self._state = 0
+                    self._state = int(value)
         return opts
 
+    def lock_device(self):
+        if self._state:
+             # power down
+            self.send_power()
+            time.sleep(2)
+
+
     def run_unlock_test(self):
+        # first to lock device.
+        self.lock_device()
+        # start to test unlock device.
         for index in range(self._unlock_times):
             print('Test: %d/%d' % (index + 1, self._unlock_times))
-            # no send power on while the first time and power on.
-            if index != 0:
-                print('power up')
-                self.send_power() # power up
-                time.sleep(4)
+            print('power up')
+            self.send_power() # power up
+            time.sleep(3)
             # unlock device.
             print('unlock')
             self.send_unlock() # unlock
             time.sleep(4)
             # power off to lock device.
-            #print('power off')
-            self.send_power() # power down
-            time.sleep(2)
-        # power on after test.
-        self.send_power()
+            if index < self._unlock_times - 1:
+                #print('power off')
+                self.send_power() # power down
+                time.sleep(1)
         print('all of %d times test done!\n' % self._unlock_times)
 
 
@@ -94,12 +96,5 @@ if __name__ == '__main__':
         sys.exit()
     # run test.
     if unlock._unlock_times:
-        # relock device for test.
-        if unlock._state:
-             # power down
-            unlock.send_power()
-            time.sleep(2)
-        unlock.send_power()
-        time.sleep(4)
         # start to test unlock
         unlock.run_unlock_test()
