@@ -262,6 +262,7 @@ class WebImage(object):
             self._thread_queue.get()
         if data:
             self._pr.pr_info('%d/%d: process %s done!' % (data[0], data[1], url))
+        return subpath
 
     def get_user_input(self, args=None):
         if not args:
@@ -341,7 +342,7 @@ class WebImage(object):
                 self._thread_queue.put(url)
                 t.start()
             else:
-                self.process_url_web(url)
+                return self.process_url_web(url)
 
 
 if __name__ == '__main__':
