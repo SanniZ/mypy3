@@ -3,20 +3,22 @@
 """
 Created on: 2019-01-02
 
-@author: Byng Zeng
+@author: Zbyng Zeng
 """
 import os
-import re
-import time
 
-from tkinter import *
+from tkinter import Tk, Frame, StringVar,\
+                    Menu, Label, Entry, Button, Listbox, Checkbutton, Scrollbar,\
+                    X, Y, TOP, LEFT, RIGHT, NORMAL, DISABLED, HORIZONTAL, BOTH
 from tkinter.filedialog import askopenfilename #askdirectory
 from tkinter import ttk
+from tkinter.messagebox import showinfo, showerror, showwarning
 
 import threading
 from queue import Queue
 
-from web.webcontent import WebContent
+from web.webbase import WebBase
+from web.webimage.webimagecrawler import URL_BASE
 from web.webimage.girlsky import Girlsky
 from web.webimage.pstatp import Pstatp
 from web.webimage.meizitu import Meizitu
@@ -26,13 +28,32 @@ from web.webimage.webimage import WebImage
 STAT_WAITTING = 'Waitting'
 STAT_DOWNLOADING = 'Downloading'
 STAT_DONE = 'Done'
+STAT_FAIL = 'Failed'
 
-class FileListInfo(object):
+ABOUT = '''
+    WebImage Crawler 1.0
+
+    Auther@Zbyng.Zeng
+
+    Copyright(c)Zbyng.Zeng
+'''
+
+
+############################################################################
+#               FileInfo Class
+############################################################################
+
+class FileInfo(object):
     def __init__(self):
         self._url = None
         self._state = STAT_WAITTING
         self._output = ''
         self._args = None
+
+
+############################################################################
+#               WindowUI Class
+############################################################################
 
 class WindowUI(object):
 
@@ -42,25 +63,10 @@ class WindowUI(object):
         top = Tk()
         self._wm['top'] = top
         top.title('WebImageCrawler')
-        top.geometry('800x646')
+        top.geometry('800x640')
 
         top.resizable(0, 0)
         self.create_menu(top)
-
-    def register_widget_handlers(self, widget_cmds, widgets_vars):
-        # widget command
-        self.menu_file_open = widget_cmds['menu_file_open']
-        self.menu_about_about = widget_cmds['menu_about_about']
-        self.on_run_click = widget_cmds['on_run_click']
-        self.on_chk_type_click = widget_cmds['on_chk_type_click']
-        self.on_bn_type_click = widget_cmds['on_bn_type_click']
-        # widget vars
-        self._lbfs_var = widgets_vars['lbfs_var']
-        self._path_var = widgets_vars['path_var']
-        self._type_var = widgets_vars['type_var']
-        self._type_chk = widgets_vars['type_chk']
-        self._type_start = widgets_vars['type_start']
-        self._type_end = widgets_vars['type_end']
 
     def run(self):
         root = self._wm['top']
@@ -77,39 +83,61 @@ class WindowUI(object):
 
         root.mainloop()
 
+    def menu_file_open(self):
+        print('run menu_file_open')
+
+    def menu_file_exit(self):
+        self._wm['top'].quit()
+
+    def menu_help_about(self):
+        print('run menu_help_about')
+
     def create_menu(self, root):
         menubar = Menu(root)
 
-        file_menu = Menu(menubar, tearoff = 0)
-        #file_menu.add_command(label = 'Open', command=self.menu_file_open)
+        menu_file = Menu(menubar, tearoff = 0)
+        menu_file.add_command(label = 'Open', command=self.menu_file_open)
+        #menu_file.add_separator()
+        menu_file.add_command(label = 'Exit', command=self.menu_file_exit)
 
-        about_menu = Menu(menubar, tearoff = 0)
-        #about_menu.add_command(label = 'About', command=self.menu_about_about)
+        menu_help = Menu(menubar, tearoff = 0)
+        menu_help.add_command(label = 'About', command=self.menu_help_about)
 
-        menubar.add_cascade(label = 'File', menu = file_menu)
-        menubar.add_cascade(label = 'About', menu = about_menu)
+        menubar.add_cascade(label = 'File', menu = menu_file)
+        menubar.add_cascade(label = 'Help', menu = menu_help)
         root['menu'] = menubar
-
+        self._wm['menu_file'] = menu_file
+        self._wm['menu_help'] = menu_help
 
     def create_main_window_frames(self, root):
-        Path = Frame(root)
-        Path.pack(side = TOP, fill=X)
+        Args = Frame(root)
+        Args.pack(side = TOP, fill = X)
+        Args = Listbox(Args, bg = 'LightGrey')
+        Args.pack(side = TOP, expand = 1, fill = X, padx = 1, pady = 1)
 
-        Type = Frame(root)
-        Type.pack(side = TOP, fill = X)
+        Path = Frame(Args)
+        Path.pack(side = TOP, expand = 1, fill = X)
 
-        Hdr = Frame(root)
-        Hdr.pack(side = TOP, fill=X)
+        Type = Frame(Args)
+        Type.pack(side = TOP, expand = 1, fill = X, pady = 2)
 
-        Fs = Frame(root)
-        Fs.pack(side = TOP, fill=X, padx =4, pady = 4)
+        FsInfo = Frame(root)
+        FsInfo.pack(side = TOP, expand = 1, fill = BOTH)
+        FsInfo = Listbox(FsInfo, bg = 'LightGrey')
+        FsInfo.pack(side = TOP, expand = 1, fill = BOTH, padx = 1, pady = 1)
+
+        Hdr = Frame(FsInfo)
+        Hdr.pack(side = TOP, fill = X)
+
+        Fs = Frame(FsInfo)
+        Fs.pack(side = TOP, expand = 1, fill = BOTH, padx = 4, pady = 4)
 
         FsList = Frame(Fs)
-        FsList.pack(side = LEFT, expand = 1, fill=X)
+        FsList.pack(side = LEFT, expand = 1, fill = BOTH)
         SbY = Frame(Fs)
         SbY.pack(side = RIGHT, fill=Y)
 
-        SbX = Frame(root)
+        SbX = Frame(FsInfo)
         SbX.pack(side = TOP, fill = X)
 
         self._wm['frmPath'] = Path
@@ -120,34 +148,50 @@ class WindowUI(object):
         self._wm['frmSbX'] = SbX
         self._wm['frmSbY'] = SbY
 
+    def on_run_click(self):
+        print('run on_run_click')
+
     def create_path_widgets(self):
         frm = self._wm['frmPath']
         lbPath = Label(frm, text = 'Path:')
-        lbPath.pack(side = LEFT, expand=1, fill=X)
-        enPath = Entry(frm, textvariable = self._path_var, width = 78)
+        lbPath.pack(side = LEFT)
+        self._path_var = StringVar()
+        enPath = Entry(frm, textvariable = self._path_var)
         enPath.pack(side = LEFT, expand=1, fill=X)
         bnPath = Button(frm, text = 'Run', command = self.on_run_click)
-        bnPath.pack(side = LEFT, expand=1, fill=X, padx = 4, pady = 2)
+        bnPath.pack(side = RIGHT, padx = 4, pady = 2)
 
         self._wm['lbPath'] = lbPath
         self._wm['enPath'] = enPath
         self._wm['bnPath'] = bnPath
 
+    def on_chk_type_click(self):
+        print('run on_bn_type_click')
+
+    def on_bn_type_click(self):
+        print('run on_chk_type_click')
+
     def create_type_widgets(self):
         frm = self._wm['frmType']
+        self._type_chk = StringVar()
         chkType = Checkbutton(frm, text = '', onvalue = 1, offvalue = 0, state = NORMAL,
                               variable = self._type_chk, command = self.on_chk_type_click)
         self._type_chk.set(0)
         chkType.pack(side = LEFT, padx = 8)
+        lbType = Label(frm, text = 'Type:')
+        lbType.pack(side = LEFT)
+        self._type_var = StringVar()
         cmbType = ttk.Combobox(frm, width = 8, textvariable = self._type_var)
-        cmbType.pack(side = LEFT, padx = 18)
+        cmbType.pack(side = LEFT, padx = 4)
         cmbType['value'] = ('xgmn', 'swmn', 'wgmn', 'zpmn', 'mnxz', 'rtys', 'jpmn', 'gzmn', 'nrtys', 'meizitu', 'mzitu')
         lbStart = Label(frm, text = 'Start:')
-        lbStart.pack(side = LEFT, padx = 8)
+        lbStart.pack(side = LEFT, padx = 4)
+        self._type_start = StringVar()
         enStart = Entry(frm, width = 8, textvariable = self._type_start)
         enStart.pack(side = LEFT)
         lbEnd = Label(frm, text = 'End:')
-        lbEnd.pack(side = LEFT, padx = 8)
+        lbEnd.pack(side = LEFT, padx = 4)
+        self._type_end = StringVar()
         enEnd = Entry(frm, width = 8, textvariable = self._type_end)
         enEnd.pack(side = LEFT)
         bnType = Button(frm, text = 'OK', width = 4, command = self.on_bn_type_click)
@@ -166,7 +210,6 @@ class WindowUI(object):
 
     def create_header_widgets(self):
         frm = self._wm['frmHdr']
-        #self.chkFsSelAll = Checkbutton(frm, justify=LEFT)
         self.lbFsURL = Label(frm, text = 'URL', width = 32)
         self.lbFsState = Label(frm, text = 'State', width = 8)
         self.lbFsOutput = Label(frm, text = 'Output', width = 32)
@@ -178,7 +221,8 @@ class WindowUI(object):
 
     def create_file_list_widgets(self):
         frmFsList = self._wm['frmFsList']
-        lbFs = Listbox(frmFsList, height = 36, listvariable = self._lbfs_var)
+        self._lbfs_var = StringVar()
+        lbFs = Listbox(frmFsList, listvariable = self._lbfs_var)
         lbFs.pack(side = LEFT, expand = 1, fill = BOTH)
         frmSbY = self._wm['frmSbY']
         sbY = Scrollbar(frmSbY)
@@ -197,29 +241,11 @@ class WindowUI(object):
         self._wm['sbX'] = sbX
 
 
+############################################################################
+#               WebImageCrawlerUI Class
+############################################################################
 
-class WebImageCrawlerUI(WebContent, WindowUI):
-
-    URL_BASE = {
-        # xval : { url_base : class}
-        'xgmn' : {'http://m.girlsky.cn/mntp/xgmn/URLID.html' : 'girlsky'},  # 性感美女
-        'swmn' : {'http://m.girlsky.cn/mntp/swmn/URLID.html' : 'girlsky'},  # 丝袜美女
-        'wgmn' : {'http://m.girlsky.cn/mntp/wgmn/URLID.html' : 'girlsky'},  # 外国美女
-        'zpmn' : {'http://m.girlsky.cn/mntp/zpmn/URLID.html' : 'girlsky'},  # 自拍美女
-        'mnxz' : {'http://m.girlsky.cn/mntp/mnxz/URLID.html' : 'girlsky'},  # 美女写真
-        'rtys' : {'http://m.girlsky.cn/mntp/rtys/URLID.html' : 'girlsky'},  # 人体艺术
-        'jpmn' : {'http://m.girlsky.cn/mntp/jpmn/URLID.html' : 'girlsky'},  # 街拍美女
-        'gzmn' : {'http://m.girlsky.cn/mntp/gzmn/URLID.html' : 'girlsky'},  # 古装美女
-        'nrtys' : {'http://m.girlsky.cn/mntpn/rtys/URLID.html' : 'girlsky'},  # 人体艺术
-        # pstatp
-        'pstatp'   : {'https://www.toutiao.com/aURLID' : 'pstatp'},
-        'pstatp_i' : {'https://www.toutiao.com/iURLID' : 'pstatp'},
-        # meizitu
-        'meizitu' : {'http://www.meizitu.com/a/URLID.html' : 'meizitu'},
-        # mzitu
-        'mzitu'   : {'https://m.mzitu.com/URLID' : 'mzitu'},
-    }
-
+class WebImageCrawlerUI(WindowUI):
 
     def __init__(self, name=None):
         super().__init__()
@@ -227,23 +253,12 @@ class WebImageCrawlerUI(WebContent, WindowUI):
 
         self._fs_list = None
         self._fs_list_cnt = 0
-        self._fs_list_state = STAT_DONE
-        self._update_thread = None
-        self._update_thread_run = 0
-        self._update_thread_queue = None
-        self._crawler_thread = None
-        self._crawler_thread_run = 0
 
         self._class = None
         self._download_thread_max = 5
-        self._download_thread_queue = None
-        self._download_threads = list()
+        self._download_thread_queue = Queue(self._download_thread_max)
+        self._download_threads = None
 
-
-    def reclaim_url_address(self, url):
-        for key, value in {'/$' : '', '\n$' : ''}.items():
-            url = re.sub(key, value, url)
-        return url
 
     def menu_file_open(self):
         f = askopenfilename()
@@ -252,26 +267,11 @@ class WebImageCrawlerUI(WebContent, WindowUI):
             self.update_file_list()
             self.update_list_info()
 
-    def menu_about_about(self):
-        print('Version: 1.0')
+    def menu_help_about(self):
+        showinfo('About', ABOUT)
 
     def on_chk_type_click(self):
-        cmbType = self._wm['cmbType']
-        enStart = self._wm['enStart']
-        enEnd = self._wm['enEnd']
-        bnType = self._wm['bnType']
-        # get state of cheType
-        state = self._type_chk.get()
-        if int(state):
-            cmbType['state'] = NORMAL
-            enStart['state'] = NORMAL
-            enEnd['state'] = NORMAL
-            bnType['state'] = NORMAL
-        else:
-            cmbType['state'] = DISABLED
-            enStart['state'] = DISABLED
-            enEnd['state'] = DISABLED
-            bnType['state'] = DISABLED
+        self.update_type_widget_state(self._type_chk.get())
 
     def on_bn_type_click(self):
         t_type  = self._type_var.get()
@@ -284,7 +284,8 @@ class WebImageCrawlerUI(WebContent, WindowUI):
                 if url_end > url_start:
                     n = url_end - url_start + 1
                 else:
-                    print('error: end(%d) < start(%d)!' % (url_end, url_start))
+                    showerror('Error', 'Start(%d) > End(%d)!' % (url_start, url_end))
+                    return
             else:
                 n = 1
             # config args
@@ -295,42 +296,56 @@ class WebImageCrawlerUI(WebContent, WindowUI):
             self.update_file_list()
             self.update_list_info()
         else:
-            print('error, please input type and start.')
+            showerror('Error', '\ntype/start is invalid.')
 
     def on_run_click(self):
         fp = self._wm['enPath'].get()
         if fp:
-            self.create_update_file_list_thread()
-
             # # update file list and info
             self.update_file_list()
             self.update_list_info()
-            self.set_widget_state(0)
-            self._fs_list_state = STAT_DOWNLOADING
+            self.update_widget_state(0)
 
-            self.create_crawler_thread()
+            self.run_download_url_thread()
+        else:
+            showwarning('Warning', '\nNot set path!')
 
-    def set_widget_state(self, state):
-        if state:
-            self._wm['bnPath']['state'] = NORMAL
-            self._wm['enPath']['state'] = NORMAL
-            self._wm['chkType']['state'] = NORMAL
+    def update_type_widget_state(self, state):
+        if int(state):
             self._wm['cmbType']['state'] = NORMAL
             self._wm['enStart']['state'] = NORMAL
             self._wm['enEnd']['state'] = NORMAL
             self._wm['bnType']['state'] = NORMAL
         else:
-            self._wm['bnPath']['state'] = DISABLED
-            self._wm['enPath']['state'] = DISABLED
-            self._wm['chkType']['state'] = DISABLED
             self._wm['cmbType']['state'] = DISABLED
             self._wm['enStart']['state'] = DISABLED
             self._wm['enEnd']['state'] = DISABLED
             self._wm['bnType']['state'] = DISABLED
 
+    def update_menu_state(self, state):
+        if int(state):
+            self._wm['menu_file'].entryconfigure('Open', state = NORMAL)
+        else:
+            self._wm['menu_file'].entryconfigure('Open', state = DISABLED)
+
+    def update_widget_state(self, state):
+        # update state of menu
+        self.update_menu_state(state)
+        # update state of widgets.
+        if int(state):
+            self._wm['chkType']['state'] = NORMAL
+            self._wm['bnPath']['state'] = NORMAL
+            self._wm['enPath']['state'] = NORMAL
+            self.update_type_widget_state(self._type_chk.get())
+        else:
+            self._wm['chkType']['state'] = DISABLED
+            self._wm['bnPath']['state'] = DISABLED
+            self._wm['enPath']['state'] = DISABLED
+            self.update_type_widget_state(0)
+
 
     def add_file_info(self, url, state = None, output = None):
-        info = FileListInfo()
+        info = FileInfo()
         info._url = url
         if state:
             info._state = state
@@ -347,6 +362,7 @@ class WebImageCrawlerUI(WebContent, WindowUI):
                     info._state = state
                 if output:
                     info._output = output
+            #print(info._url, info._state, info._output)
             fs.append('%s%s%s' % (info._url.ljust(64), info._state.ljust(16), info._output.ljust(64)))
         self._lbfs_var.set(tuple(fs))
 
@@ -366,41 +382,19 @@ class WebImageCrawlerUI(WebContent, WindowUI):
             url_type = args['-x']
             urls = list()
             for index in range(n):
-                if url_type in self.URL_BASE:
-                    url_base = list(self.URL_BASE[url_type])[0]
+                if url_type in URL_BASE:
+                    url_base = list(URL_BASE[url_type])[0]
                     url = url_base.replace('URLID', str(url_start + index))
                     urls.append(url)
         else:
             urls = [f]
         # add file info to list.
         for url in set(urls):
-            url = self.reclaim_url_address(url)
+            url = WebBase.reclaim_url_address(url)
             if url:
                 self.add_file_info(url)
         # sort of file list.
         self._fs_list.sort(key = lambda info: info._url, reverse=False)
-
-    def create_update_file_list_thread(self):
-        if not self._update_thread:
-            self._update_thread = threading.Thread(target = self.update_file_list_thread)
-            self._update_thread_run = 1
-            self._update_thread_queue = Queue()
-            self._update_thread.start()
-
-    def update_file_list_thread(self):
-        while self._update_thread_run:
-            if self._update_thread_queue.empty():
-                time.sleep(1)
-                continue
-            else:
-                info = self._update_thread_queue.get()
-                self.update_list_info(info._url, info._state, info._output)
-                # Url done.
-                if info._state == STAT_DONE:
-                    self._fs_list_cnt -= 1
-            if self._fs_list_cnt <= 0:
-                self.set_widget_state(1)
-                self._fs_list_state = STAT_DONE
 
     def download_url(self, args=None):
         url = args['-u']
@@ -419,99 +413,73 @@ class WebImageCrawlerUI(WebContent, WindowUI):
             for info in self._fs_list:
                 if info._url == url:
                     info._state = STAT_DOWNLOADING
-                    self._update_thread_queue.put(info)
+                    self.update_list_info(info._url, info._state, info._output)
                     break
             output = hdr.main(args)
+            # update state to DONE.
+            for info in self._fs_list:
+                if info._url == url:
+                    # failed if output is None.
+                    if output:
+                        info._output = output
+                        info._state = STAT_DONE
+                    else:
+                        info._state = STAT_FAIL
+                    # update file info.
+                    self.update_list_info(info._url, info._state, info._output)
+                    break
         else:
-            self._pr.pr_err('[WebImageCrawler] Error, no found handler!')
-        # release queue
-        if self._download_thread_queue:
-            self._download_thread_queue.get()
+            self._pr.pr_err('Error, no found handler!')
+            for info in self._fs_list:
+                if info._url == url:
+                    info._state = STAT_FAIL
+                    self.update_list_info(info._url, info._state, info._output)
+                    break
+        # release thread.
+        self._download_thread_queue.get()
 
-        for info in self._fs_list:
-            if info._url == url:
-                info._state = STAT_DONE
-                info._output = output
-                self._update_thread_queue.put(info)
-                break
+    def crawler_download_url(self):
+        if self._fs_list_cnt:
+            index = 0
+            self._download_threads = list()
+            # create thread to download url.
+            while self._fs_list_cnt:
+                self._class = None
+                info = self._fs_list[index]
+                index += 1
+                self._fs_list_cnt -= 1
+                url = WebBase.reclaim_url_address(info._url)
+                base, num = WebBase.get_url_base_and_num(url)
+                if base:
+                    for dict_url_base in URL_BASE.values():
+                        if base == list(dict_url_base)[0]:
+                            self._class =  dict_url_base[base]
+                            break
+                if self._class:
+                    url = {'-u' : url}
+                    # create thread and put to queue.
+                    t = threading.Thread(target = self.download_url, args = (url,))
+                    self._download_thread_queue.put(url)
+                    self._download_threads.append(t)
+                    t.start()
+            for t in self._download_threads:
+                t.join()
+            self.update_widget_state(1)
+            #print('All of url are done!')
 
+    def run_download_url_thread(self):
+        self.update_file_list()
+        self.update_list_info()
+        threading.Thread(target = self.crawler_download_url).start()
 
-    def create_crawler_thread(self):
-        if not self._crawler_thread:
-            self._download_thread_queue = Queue(self._download_thread_max)
-            self._crawler_thread = threading.Thread(target = self.crawler_thread)
-            self._crawler_thread_run = 1
-            self._crawler_thread.start()
-
-    def crawler_thread(self):
-        while self._crawler_thread_run:
-            if self._fs_list_cnt:
-                if self._fs_list_state != STAT_DOWNLOADING: # all of url are not donwload.
-                    time.sleep(2)
-                    continue
-                index = 0
-                count = self._fs_list_cnt
-                self._download_threads = list()
-                # create thread to download url.
-                while index < count:
-                    self._class = None
-                    info = self._fs_list[index]
-                    index += 1
-                    url = self.reclaim_url_address(info._url)
-                    base, num = self.get_url_base_and_num(url)
-                    if base:
-                        for dict_url_base in self.URL_BASE.values():
-                            if base == list(dict_url_base)[0]:
-                                self._class =  dict_url_base[base]
-                                break
-                    if self._class:
-                        url = {'-u' : url}
-                        # create thread and put to queue.
-                        t = threading.Thread(target=self.download_url, args=(url,))
-                        t.start()
-                        self._download_thread_queue.put(url)
-                        self._download_threads.append(t)
-                for t in self._download_threads:
-                    t.join()
-            else:
-                time.sleep(1)
-                continue
-
-    def create_widget_cmd_vars(self):
-        self._lbfs_var = StringVar()
-        self._path_var = StringVar()
-        self._type_var = StringVar()
-        self._type_chk = StringVar()
-        self._type_start = StringVar()
-        self._type_end = StringVar()
-        widget_cmds = {'menu_file_open' : self.menu_file_open,
-                       'menu_about_about' : self.menu_about_about,
-                       'on_run_click' : self.on_run_click,
-                       'on_chk_type_click' : self.on_chk_type_click,
-                       'on_bn_type_click' : self.on_bn_type_click
-                       }
-        widget_vars = {'lbfs_var' : self._lbfs_var,
-                       'path_var' : self._path_var,
-                       'type_var' : self._type_var,
-                       'type_chk' : self._type_chk,
-                       'type_start' : self._type_start,
-                       'type_end' : self._type_end
-                       }
-        return widget_cmds, widget_vars
 
     def main(self):
-        widget_cmds, widget_vars = self.create_widget_cmd_vars()
-        self.register_widget_handlers(widget_cmds, widget_vars)
         self.run()
 
-        # exit
-        self._update_thread_run = 0
-        self._crawler_thread_run = 0
-        if self._update_thread:
-            self._update_thread.join()
-        if self._crawler_thread:
-            self._crawler_thread.join()
 
+############################################################################
+#               main entrance
+############################################################################
 
 if __name__ == '__main__':
     ui = WebImageCrawlerUI()

@@ -37,7 +37,7 @@ class Base (object):
         except getopt.GetoptError as e:
             cls.print_exit('%s, -h for help.' % str(e))
         if not opts:
-            cls.print_exit('No input, -h for help.')
+            cls.print_exit('invalid input, -h for help.')
         else:
             for name, value in opts:
                 result[name] = value

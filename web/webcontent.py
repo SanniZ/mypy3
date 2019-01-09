@@ -72,14 +72,20 @@ class WebContent (object):
         return charset
 
     @classmethod
-    def get_html(cls, url, context=None, retry_times=3, view=True):
+    def get_html(cls, url, context=None, retry_times=3, view=False):
         if view:
             cls.pr.pr_info('Downloading: %s' % url)
-        for index in range(retry_times):
+        html_content = None
+        while all((retry_times, not html_content)):
+            retry_times -= 1
             url_charset = None
             req = Request(url, headers=URL_HEADER)
             try:
                 html = urlopen(req, context=context)
+            except URLError as e:
+                cls.pr.pr_warn(str(e))
+                html_content = None
+            else:
                 content_type = html.getheader('Content-Type')
                 if content_type:
                     url_charset = cls.get_url_charset(content_type=content_type)
@@ -101,14 +107,8 @@ class WebContent (object):
                                 elif charset == url_charset:
                                     break
                 else:
-                    cls.pr.pr_err('Error: fail to get data from html')
+                    #cls.pr.pr_err('Error: fail to get data from html')
                     html_content = None
-            except URLError as e:
-                cls.pr.pr_warn(e.reason)
-                html_content = None
-            # get content and break.
-            if html_content:
-                break
         return html_content
 
     @classmethod
@@ -167,13 +167,18 @@ class WebContent (object):
                 context = None
             try:
                 r = urlopen(req, context = context)
-                if r:
+            except (URLError, HTTPError) as e:
+                cls.pr.pr_warn('%s, uget %s failed.' % (str(e), url))
+            else:
+                try:
+                    data = r.read()
+                except ConnectionResetError as e:
+                    cls.pr.pr_err(str(e))
+                else:
                     with open(fname, 'wb') as f:
                         if view:
                             cls.pr.pr_info('uget: %s' % fname)
-                        f.write(r.read())
-            except (URLError, HTTPError) as e:
-                cls.pr.pr_warn('%s, uget %s failed.' % (str(e), url))
+                        f.write(data)
 
     @classmethod
     def requests_get_url_file(cls, url, path, view=False):

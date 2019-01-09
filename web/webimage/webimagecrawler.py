@@ -24,6 +24,25 @@ from web.webimage.meizitu import Meizitu
 from web.webimage.mzitu import Mzitu
 from web.webimage.webimage import WebImage
 
+URL_BASE = {
+    # xval : { url_base : class}
+    'xgmn' : {'http://m.girlsky.cn/mntp/xgmn/URLID.html' : 'girlsky'},  # 性感美女
+    'swmn' : {'http://m.girlsky.cn/mntp/swmn/URLID.html' : 'girlsky'},  # 丝袜美女
+    'wgmn' : {'http://m.girlsky.cn/mntp/wgmn/URLID.html' : 'girlsky'},  # 外国美女
+    'zpmn' : {'http://m.girlsky.cn/mntp/zpmn/URLID.html' : 'girlsky'},  # 自拍美女
+    'mnxz' : {'http://m.girlsky.cn/mntp/mnxz/URLID.html' : 'girlsky'},  # 美女写真
+    'rtys' : {'http://m.girlsky.cn/mntp/rtys/URLID.html' : 'girlsky'},  # 人体艺术
+    'jpmn' : {'http://m.girlsky.cn/mntp/jpmn/URLID.html' : 'girlsky'},  # 街拍美女
+    'gzmn' : {'http://m.girlsky.cn/mntp/gzmn/URLID.html' : 'girlsky'},  # 古装美女
+    'nrtys' : {'http://m.girlsky.cn/mntpn/rtys/URLID.html' : 'girlsky'},  # 人体艺术
+    # pstatp
+    'pstatp'   : {'https://www.toutiao.com/aURLID' : 'pstatp'},
+    'pstatp_i' : {'https://www.toutiao.com/iURLID' : 'pstatp'},
+    # meizitu
+    'meizitu' : {'http://www.meizitu.com/a/URLID.html' : 'meizitu'},
+    # mzitu
+    'mzitu'   : {'https://m.mzitu.com/URLID' : 'mzitu'},
+}
 
 class WebImageCrawler(WebContent):
 
@@ -64,26 +83,6 @@ class WebImageCrawler(WebContent):
         '    set number of thread to download images.',
     )
 
-    URL_BASE = {
-        # xval : { url_base : class}
-        'xgmn' : {'http://m.girlsky.cn/mntp/xgmn/URLID.html' : 'girlsky'},  # 性感美女
-        'swmn' : {'http://m.girlsky.cn/mntp/swmn/URLID.html' : 'girlsky'},  # 丝袜美女
-        'wgmn' : {'http://m.girlsky.cn/mntp/wgmn/URLID.html' : 'girlsky'},  # 外国美女
-        'zpmn' : {'http://m.girlsky.cn/mntp/zpmn/URLID.html' : 'girlsky'},  # 自拍美女
-        'mnxz' : {'http://m.girlsky.cn/mntp/mnxz/URLID.html' : 'girlsky'},  # 美女写真
-        'rtys' : {'http://m.girlsky.cn/mntp/rtys/URLID.html' : 'girlsky'},  # 人体艺术
-        'jpmn' : {'http://m.girlsky.cn/mntp/jpmn/URLID.html' : 'girlsky'},  # 街拍美女
-        'gzmn' : {'http://m.girlsky.cn/mntp/gzmn/URLID.html' : 'girlsky'},  # 古装美女
-        'nrtys' : {'http://m.girlsky.cn/mntpn/rtys/URLID.html' : 'girlsky'},  # 人体艺术
-        # pstatp
-        'pstatp'   : {'https://www.toutiao.com/aURLID' : 'pstatp'},
-        'pstatp_i' : {'https://www.toutiao.com/iURLID' : 'pstatp'},
-        # meizitu
-        'meizitu' : {'http://www.meizitu.com/a/URLID.html' : 'meizitu'},
-        # mzitu
-        'mzitu'   : {'https://m.mzitu.com/URLID' : 'mzitu'},
-    }
-
     def __init__(self, name=None):
         self._name = name
         self._web_base = None
@@ -113,9 +112,9 @@ class WebImageCrawler(WebContent):
             self._pr.set_pr_level(self._pr.get_pr_level() | Print.PR_LVL_DBG)
         # get url_base from xval
         if self._xval:
-            if self._xval in self.URL_BASE:
-                self._url_base = list(self.URL_BASE[self._xval])[0]
-                self._class = self.URL_BASE[self._xval][self._url_base]
+            if self._xval in URL_BASE:
+                self._url_base = list(URL_BASE[self._xval])[0]
+                self._class = URL_BASE[self._xval][self._url_base]
             else:
                 Base.print_exit('[WebImageCrawler] Error, invalid -x val!')
         # get class from url
@@ -125,7 +124,7 @@ class WebImageCrawler(WebContent):
                 self._url_base = base
         # get class from url_base
         if all((not self._class, self._url_base)):
-                for dict_url_base in self.URL_BASE.values():
+                for dict_url_base in URL_BASE.values():
                     if self._url_base == list(dict_url_base)[0]:
                         self._class =  dict_url_base[self._url_base]
                         break
@@ -176,7 +175,7 @@ class WebImageCrawler(WebContent):
                 # get base and num
                 base, num = self.get_url_base_and_num(url)
                 if base:
-                    for dict_url_base in self.URL_BASE.values():
+                    for dict_url_base in URL_BASE.values():
                         if base == list(dict_url_base)[0]:
                             self._class =  dict_url_base[base]
                             break

@@ -204,7 +204,7 @@ if __name__ == '__main__':
         '    xval for cmd ext functions.',
         '  -o path,rename,nz: rename image to order',
         '    path: path of images',
-        '    rename: the format of image to be rename'
+        '    rename: the format of image to be rename',
         '    nz: True is set %0d, False is set %d'
     )
 
@@ -234,9 +234,12 @@ if __name__ == '__main__':
     if '-o' in args:
         val = args['-o'].split(',')
         n = len(val)
-        if n == 2:
-            Img.set_order_images(Path.get_abs_path(val[0]), val[1])
-        elif n >= 3:
+
+        if n >= 3:
             Img.set_order_images(Path.get_abs_path(val[0]), val[1], val[2])
-        else:
+        elif n == 2:
+            Img.set_order_images(Path.get_abs_path(val[0]), val[1])
+        elif n == 1:
             Img.set_order_images(Path.get_abs_path(val[0]))
+        else:
+            print('Error, -h for help!')
