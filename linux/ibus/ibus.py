@@ -6,14 +6,14 @@ Created on 2018-12-05
 @author: Byng Zeng
 """
 
+import os
 import subprocess
 
 from mypy.base import Base
-from mypy.path import Path
 
-WUBI_LOVE98_TXT = '%s/linux/ibus/ibus-love98.txt' % Path.get_mypy_path()
-WUBI_LOVE98_DB = '%s/linux/ibus/ibus-love98.db' % Path.get_mypy_path()
-IBUS_LOVE98_DB = '/usr/share/ibus-table/tables/wubi-love98.db'
+WUBI_LOVE98_TXT = '%s/wubi-love98/wubi-love98.txt' % os.getenv('IBus')
+WUBI_LOVE98_DB  = '%s/wubi-love98/wubi-love98.db' % os.getenv('IBus')
+IBUS_LOVE98_DB  = '/usr/share/ibus-table/tables/wubi-love98.db'
 
 class IBus(object):
 

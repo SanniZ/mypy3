@@ -184,45 +184,56 @@ class Image (object):
                 for f, fname in fdict.items():
                     os.rename(f, fname)
 
+    @classmethod
+    def get_image_detail(cls, f):
+        fmt = size = mode = None
+        img = cls.image_file(f)
+        if img:
+            fmt = img.format
+            size = img.size
+            mode = img.mode
+        return fmt, size, mode
+
 if __name__ == '__main__':
     from mypy.base import Base
     from mypy.path import Path
-    from mypy.print import Print
+    from mypy.pr import Print
 
     HELP_MENU = (
         '============================================',
         '    Image help',
         '============================================',
-        'options: -c cmd -r path -R path -x val -o path[,rename][,nz]',
+        'options:',
         '  -c img: check img is a image file',
         '    img: the path of image file',
-        '  -r path: remove small size of images',
+        '  -r path,(w,d): remove small size of images',
         '    path: path of dir or file',
         '  -R path: reclaim image format',
         '    path: path of dir or file',
-        '  -x val:',
-        '    xval for cmd ext functions.',
         '  -o path,rename,nz: rename image to order',
         '    path: path of images',
         '    rename: the format of image to be rename',
-        '    nz: True is set %0d, False is set %d'
+        '    nz: True is set %0d, False is set %d',
+        '  -i img: show detail info of image file',
+        '    img: the path of image file',
     )
 
     Img = Image()
     pr = Print(Img.__class__.__name__)
     xval = None
-    args = Base.get_user_input('hc:r:R:x:o:')
+    args = Base.get_user_input('hc:r:R:x:o:i:')
     if '-h' in args:
         Base.print_help(HELP_MENU)
-    if '-x' in args:
-        xval = args['-x']
     if '-c' in args:
         result = Img.image_file(Path.get_abs_path(args['-c']))
         pr.pr_info(result)
     if '-r' in args:
-        path = args['-r']
-        if xval:
-            Img.remove_small_image(path, int(xval), int(xval))
+        data = args['-r'].split(',')
+        path = data[0]
+        if len(data) >=2:
+            w = data[1]
+            h = data[2]
+            Img.remove_small_image(path, int(w), int(h))
         else:
             Img.remove_small_image(path)
     if '-R' in args:
@@ -243,3 +254,12 @@ if __name__ == '__main__':
             Img.set_order_images(Path.get_abs_path(val[0]))
         else:
             print('Error, -h for help!')
+    if '-i' in args:
+        f = args['-i']
+        fmt, size, mode = Img.get_image_detail(f)
+        if all((fmt, size, mode)):
+            print('format:', fmt)
+            print('size:', size)
+            print('mode:', mode)
+        else:
+            print('It is a bad image file!')

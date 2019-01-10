@@ -94,16 +94,16 @@ class ICSCalendar(object):
         '======================================',
         '     iOS Calender Data Convert',
         '======================================',
-        'option: -s xxx -t xxx [-f xxx] [-r xxx] [-c]',
-        '  -c:',
+        'option:',
+        '  -c True/False :',
         '    True is combine all of .ics file together, False is not.',
-        '  -f txt/csv:',
+        '  -f txt/csv :',
         '    format of output file',
-        '  -r True/False:',
+        '  -r True/False :',
         '    True is ascending sort, False is descending, default to False.',
-        '  -s xxx.ics or xxx/:',
+        '  -s xxx.ics or xxx/ :',
         '    xxx/ is a path, xxx.ics is a ics file',
-        '  -t xxx/ or xxx.xxx:',
+        '  -t xxx/ or xxx.xxx :',
         '    xxx/ is is a path, xxx.xxx is the name of target',
     )
 
@@ -400,7 +400,7 @@ class ICSCalendar(object):
                 # get ICSCalendar Name
                 calName = self._re.get_cal_name(buf)
                 if calName:
-                    self._cal_name = calName.group()[len('X-WR-CALNAME:'):len(calName.group())-1]
+                    self._cal_name = calName.group()[len('X-WR-CALNAME:'):]
                 # get location
                 location = self._re.get_location(buf)
                 if location:

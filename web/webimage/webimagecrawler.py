@@ -15,7 +15,7 @@ import queue
 
 from mypy.base import Base
 from mypy.path import Path
-from mypy.print import Print
+from mypy.pr import Print
 
 from web.webcontent import WebContent
 from web.webimage.girlsky import Girlsky
@@ -50,16 +50,16 @@ class WebImageCrawler(WebContent):
         '==================================',
         '    WebImageCrawler help',
         '==================================',
-        'option: -u url -n number -p path -x val -m mode -R file -t num -v',
-        '  -u:',
+        'option:',
+        '  -u url:',
         '    url of web to be download',
-        '  -n:',
+        '  -n num:',
         '    number of web number to be download',
-        '  -p:',
+        '  -p path:',
         '    root path to store images.',
         '  -v:',
         '    view info while download.',
-        '  -x:',
+        '  -x val:',
         '    xgmn:    xgmn of girlsky',
         '    swmn:    swmn of girlsky',
         '    wgmn:    wgmn of girlsky',
@@ -72,14 +72,14 @@ class WebImageCrawler(WebContent):
         '    toutiao: toutiao of toutiao',
         '    meizitu: meizitu of meizitu',
         '    mzitu:   mzitu of mzitu',
-        '  -m:',
+        '  -m mode:',
         '    wget: using wget to download imgages',
         '    rtrv: using retrieve to download images',
         '    rget: using requests to download images',
         '    uget: using urlopen to download images',
-        '  -R:',
+        '  -R file:',
         '    re config file for re_image_url.',
-        '  -t:',
+        '  -t num:',
         '    set number of thread to download images.',
     )
 
@@ -94,13 +94,15 @@ class WebImageCrawler(WebContent):
         self._class = None
         self._thread_max = 5
         self._thread_queue = None
-
+        self._run_ui = None
 
     def get_input(self, args=None):
         if not args:
-            args = Base.get_user_input('hu:n:p:x:m:R:t:vDd')
+            args = Base.get_user_input('hu:n:p:x:m:R:t:UvDd')
         if '-h' in args:
             Base.print_help(self.HELP_MENU)
+        if '-U' in args:
+            self._run_ui = True
         if '-u' in args:
             if os.path.isfile(args['-u']):
                 self._url_file = Path.get_abs_path(args['-u'])
@@ -192,7 +194,10 @@ class WebImageCrawler(WebContent):
     def main(self, args=None):
         if not args:
             args = self.get_input()
-        if self._url_file:
+        if self._run_ui:
+            cwd = os.path.dirname(os.path.realpath(__file__))
+            os.system('%s/webimagecrawlerUI.py' % cwd)
+        elif self._url_file:
             self.process_file_input(args)
         else:
             self.process_input()

@@ -5,11 +5,13 @@ Created on 2018-12-04
 
 @author: Byng Zeng
 """
+import os
+import re
 
 from base import Base
 from file import File
 from path import Path
-from print import Print
+from pr import Print
 
 
 class MyPy(object):
@@ -84,7 +86,7 @@ if __name__ == '__main__':
         '============================================',
         '    mypy help',
         '============================================',
-        'options: -f path,wd[,ftype] -s path,wd,newd[,ftype]',
+        'options:',
         '  -f path,wd,ftype: find wd in path',
         '    path : path to dir or file',
         '    wd   : word will be find',

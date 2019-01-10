@@ -253,6 +253,7 @@ class WebImageCrawlerUI(WindowUI):
 
         self._fs_list = None
         self._fs_list_cnt = 0
+        self._fs_list_lock = threading.Lock()
 
         self._class = None
         self._download_thread_max = 5
@@ -264,7 +265,7 @@ class WebImageCrawlerUI(WindowUI):
         f = askopenfilename()
         self._path_var.set(f)
         if f:
-            self.update_file_list()
+            self.update_url_list()
             self.update_list_info()
 
     def menu_help_about(self):
@@ -293,7 +294,7 @@ class WebImageCrawlerUI(WindowUI):
             self._path_var.set(args)
 
             # update file list and info.
-            self.update_file_list()
+            self.update_url_list()
             self.update_list_info()
         else:
             showerror('Error', '\ntype/start is invalid.')
@@ -302,11 +303,11 @@ class WebImageCrawlerUI(WindowUI):
         fp = self._wm['enPath'].get()
         if fp:
             # # update file list and info
-            self.update_file_list()
+            self.update_url_list()
             self.update_list_info()
             self.update_widget_state(0)
 
-            self.run_download_url_thread()
+            self.download_url_list()
         else:
             showwarning('Warning', '\nNot set path!')
 
@@ -344,7 +345,7 @@ class WebImageCrawlerUI(WindowUI):
             self.update_type_widget_state(0)
 
 
-    def add_file_info(self, url, state = None, output = None):
+    def add_url_info_to_list(self, url, state = None, output = None):
         info = FileInfo()
         info._url = url
         if state:
@@ -355,18 +356,19 @@ class WebImageCrawlerUI(WindowUI):
         self._fs_list_cnt += 1
 
     def update_list_info(self, url = None, state = None, output = None):
-        fs = list()
-        for i, info in enumerate(self._fs_list):
-            if url == info._url:
-                if state:
-                    info._state = state
-                if output:
-                    info._output = output
-            #print(info._url, info._state, info._output)
-            fs.append('%s%s%s' % (info._url.ljust(64), info._state.ljust(16), info._output.ljust(64)))
-        self._lbfs_var.set(tuple(fs))
+        with self._fs_list_lock:
+            fs = list()
+            for i, info in enumerate(self._fs_list):
+                if url == info._url:
+                    if state:
+                        info._state = state
+                    if output:
+                        info._output = output
+                #print(info._url, info._state, info._output)
+                fs.append('%s%s%s' % (info._url.ljust(64), info._state.ljust(16), info._output.ljust(64)))
+            self._lbfs_var.set(tuple(fs))
 
-    def update_file_list(self):
+    def update_url_list(self):
         # clear file list
         self._fs_list_cnt = 0
         self._fs_list = list()
@@ -392,7 +394,7 @@ class WebImageCrawlerUI(WindowUI):
         for url in set(urls):
             url = WebBase.reclaim_url_address(url)
             if url:
-                self.add_file_info(url)
+                self.add_url_info_to_list(url)
         # sort of file list.
         self._fs_list.sort(key = lambda info: info._url, reverse=False)
 
@@ -410,31 +412,17 @@ class WebImageCrawlerUI(WindowUI):
         else:
             hdr = WebImage('WebImage')
         if hdr:
-            for info in self._fs_list:
-                if info._url == url:
-                    info._state = STAT_DOWNLOADING
-                    self.update_list_info(info._url, info._state, info._output)
-                    break
+            self.update_list_info(url, STAT_DOWNLOADING)
             output = hdr.main(args)
             # update state to DONE.
-            for info in self._fs_list:
-                if info._url == url:
-                    # failed if output is None.
-                    if output:
-                        info._output = output
-                        info._state = STAT_DONE
-                    else:
-                        info._state = STAT_FAIL
-                    # update file info.
-                    self.update_list_info(info._url, info._state, info._output)
-                    break
+            if output:
+                self.update_list_info(url, STAT_DONE, output)
+            else:
+                self.update_list_info(url, STAT_FAIL)
         else:
             self._pr.pr_err('Error, no found handler!')
-            for info in self._fs_list:
-                if info._url == url:
-                    info._state = STAT_FAIL
-                    self.update_list_info(info._url, info._state, info._output)
-                    break
+            self.update_list_info(url, STAT_FAIL)
+
         # release thread.
         self._download_thread_queue.get()
 
@@ -467,8 +455,8 @@ class WebImageCrawlerUI(WindowUI):
             self.update_widget_state(1)
             #print('All of url are done!')
 
-    def run_download_url_thread(self):
-        self.update_file_list()
+    def download_url_list(self):
+        self.update_url_list()
         self.update_list_info()
         threading.Thread(target = self.crawler_download_url).start()
 

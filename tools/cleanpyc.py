@@ -18,7 +18,7 @@ help_menu = (
     '===================================',
     '    clean .pyc',
     '===================================',
-    'option: [-p path] [-v]',
+    'option:',
     '  -p path:',
     '    root path to clean .pyc',
     '  -v',

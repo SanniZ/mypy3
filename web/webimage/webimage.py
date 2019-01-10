@@ -13,7 +13,7 @@ import queue
 
 from mypy.base import Base
 from mypy.path import Path
-from mypy.print import Print
+from mypy.pr import Print
 
 from web.webcontent import WebContent, USER_AGENTS
 from image.image import Image
@@ -25,25 +25,25 @@ class WebImage(object):
         '==================================',
         '    WebImage help',
         '==================================',
-        'option: -u url -n num -p path -x val -m mode -R file -t num -v',
-        '  -u:',
+        'option:',
+        '  -u url:',
         '    url of web to be download',
-        '  -n:',
+        '  -n num:',
         '    number of web number to be download',
-        '  -p:',
+        '  -p path:',
         '    root path to store images.',
         '  -v:',
         '    view info while download.',
-        '  -x:',
+        '  -x val:',
         '    val for expand cmd.',
-        '  -m:',
+        '  -m mode:',
         '    wget: using wget to download imgages',
         '    rtrv: using retrieve to download images',
         '    rget: using requests to download images',
         '    uget: using urlopen to download images',
-        '  -R:',
+        '  -R file:',
         '    re config file for re_image_url.'
-        '  -t:',
+        '  -t num:',
         '    set max number of thread to download web.'
     )
 
@@ -213,7 +213,7 @@ class WebImage(object):
     # process url web images.
     def process_url_web(self, url, data=None):
         # get header web
-        header_content = self.get_url_content(url, view=True)
+        header_content = self.get_url_content(url, view=False)
         if not header_content:
             if self._thread_queue:
                 self._thread_queue.get()

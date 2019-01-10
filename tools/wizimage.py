@@ -23,10 +23,10 @@ class WizImage(object):
         '======================================',
         '     Unzip Wiz',
         '======================================',
-        'option: -s path -p path -v True/False',
-        '  -s: root path of files',
-        '  -t: root path to output.',
-        '  -v: show infomation of unzip.',
+        'option:',
+        '  -s path: root path of files',
+        '  -t path: root path to output.',
+        '  -v True/False: show infomation of unzip.',
     )
 
     def __init__(self):

@@ -10,7 +10,7 @@ import re
 
 from mypy.base import Base
 from mypy.path import Path
-from mypy.print import Print
+from mypy.pr import Print
 
 class WebURLCrawler(object):
 
@@ -18,7 +18,7 @@ class WebURLCrawler(object):
         '==================================',
         '    WebURLCrawler help',
         '==================================',
-        'option: -s path -t file',
+        'option:',
         '  -s path: path to be collect',
         '  -t file: file to be save urls',
     )

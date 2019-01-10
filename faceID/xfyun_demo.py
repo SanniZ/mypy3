@@ -20,9 +20,11 @@ help_menu = (
     '======================================',
     '    XunFei FaceID',
     '======================================',
-    'option: -f path -s path',
-    '  -f: path of the first image',
-    '  -s: path of the second image',
+    'option:',
+    '  -f path: set first image',
+    '    path: the path of the first image',
+    '  -s path: set the second image',
+    '    path: path of the second image',
 )
 
 def get_face_image():

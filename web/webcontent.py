@@ -19,7 +19,7 @@ import socket
 
 from mypy.path import Path
 from mypy.file import File
-from mypy.print import Print
+from mypy.pr import Print
 
 USER_AGENTS = {
     'AppleWebKit/537.36' : 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36 LBBROWSER',
@@ -265,13 +265,12 @@ class WebContent (object):
 if __name__ == '__main__':
 
     from mypy.base import Base
-    from mypy.print import Print
 
     HELP_MENU = (
         '==================================',
         '    WebContentApp help',
         '==================================',
-        'option: -u url -p path -d mode -v',
+        'option:',
         '  -u url:',
         '    url of web to be download',
         '  -p path:',
